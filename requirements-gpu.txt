@@ -1,0 +1,17 @@
+# GPU / fine-tuning extras — install on the machine with the NVIDIA GPU.
+#
+#   1) Install a CUDA build of torch first (match your CUDA version):
+#        https://pytorch.org/get-started/locally/
+#   2) pip install -r requirements.txt
+#   3) pip install -r requirements-gpu.txt
+#
+# These are the heavy dependencies that are NOT needed for the toy backend,
+# the API, the apps, the smoke test or CI.
+
+peft>=0.13
+trl>=0.12
+datasets>=3.0
+bitsandbytes>=0.44          # QLoRA 4-bit (Linux/Windows + NVIDIA)
+unsloth>=2024.11            # fast Gemma 4 multimodal LoRA
+sentencepiece>=0.2
+kaggle>=1.6                 # RSNA dataset download

@@ -37,6 +37,28 @@ python eval/run_evaluation.py --mode toy
 streamlit run app/streamlit_app.py
 ```
 
+Par défaut tout tourne avec le backend `toy` (déterministe, sans GPU). Pour la
+chaîne réelle (MedGemma / Gemma 4 + RSNA) sur une machine GPU, suivre
+[docs/guide_execution_gpu.md](docs/guide_execution_gpu.md).
+
+## Backends d'inférence
+
+Le même contrat de sortie JSON est servi par trois backends, sélectionnés par
+`--backend` (éval), `RADIO_BACKEND` (API/UI) ou `src.inference.predict(..., backend=...)` :
+
+| Backend | Modèle | Dépendances | Usage |
+|---|---|---|---|
+| `toy` | prédicteur déterministe | aucune (CPU) | smoke test, CI, démo hors-ligne |
+| `vlm` | MedGemma 4B / Gemma (HF) | `transformers`, `torch` | baseline réelle par prompting |
+| `classifier` | CNN/ViT léger (resnet18…) | `torch`, `torchvision` | support de confiance / calibration |
+
+```bash
+# Baseline réelle vs prompt amélioré sur les cas RSNA, modèle MedGemma 4B
+export RADIO_VLM_MODEL=google/medgemma-4b-it
+python eval/run_evaluation.py --backend vlm --mode toy \
+  --cases data/rsna/cases.csv --split final --out-dir eval/outputs --db-path runs.sqlite
+```
+
 ## Smoke test du dépôt
 
 Avant une soutenance, un push ou une livraison, lancer le contrôle court :
@@ -72,17 +94,21 @@ La réponse doit contenir une classe, une confiance, des observations visuelles,
 ```text
 assistant-radiologue-virtuel/
 ├── README.md
-├── docs/          # appel d'offre, architecture, éthique, évaluation
-├── data/          # cas synthétiques et images jouet
+├── docs/          # appel d'offre, architecture, éthique, évaluation, rapport, guide GPU
+├── data/          # cas synthétiques + builders RSNA + datasets.md
 ├── prompts/       # prompt baseline, prompt amélioré, schéma JSON
-├── src/           # inférence jouet, garde-fous, métriques, SQLite
+├── src/           # inférence (toy/vlm/classifier), garde-fous, métriques, datasets, SQLite
 ├── api/           # FastAPI
 ├── app/           # Streamlit / Gradio
 ├── eval/          # évaluation, sorties CSV/JSON, registre d'erreurs
 ├── tests/         # smoke tests et contrat minimal
 ├── notebooks/     # notebooks de démarrage
-└── finetuning/    # stubs expérimentaux, non obligatoires
+└── finetuning/    # LoRA Gemma 4 (Unsloth) + QLoRA MedGemma (PEFT), expérimentaux
 ```
+
+Modules clés ajoutés : `src/vlm_inference.py` (MedGemma/Gemma), `src/classifier.py`
+(CNN/ViT léger), `src/datasets.py` (builders RSNA). Dépendances GPU séparées dans
+`requirements-gpu.txt`. Rapport : [docs/rapport.md](docs/rapport.md).
 
 ## Livrables attendus
 
