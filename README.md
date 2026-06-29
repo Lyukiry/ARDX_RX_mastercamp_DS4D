@@ -27,15 +27,37 @@ Prototype pédagogique d'IA médicale multimodale pour apprendre à construire u
 
 Le bon rendu ne cherche pas à impressionner par un modèle spectaculaire. Il démontre une méthode : périmètre limité, baseline reproductible, garde-fous, évaluation, analyse d'erreurs et limites explicites.
 
+> 🖥️ **Lancer les vrais modèles (MedGemma, Gemma, classifieur) sur un PC GPU :**
+> voir **[README_GPU.md](README_GPU.md)** (guide clair, copier-coller).
+
 ## Démarrage rapide
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python eval/run_evaluation.py --mode toy
+
+# Démo web 4 onglets (Cas / Analyse / Apprentissage / Suivi)
 streamlit run app/streamlit_app.py
+
+# Évaluations reproductibles (sans GPU)
+python eval/run_evaluation.py --mode toy --out-dir /tmp/eval --db-path /tmp/runs.sqlite          # contrat (parfait)
+python eval/run_evaluation.py --mode toy --backend noisy --split final \
+    --out-dir /tmp/eval --db-path /tmp/runs.sqlite                                                # mesures réalistes (L8)
+python eval/compare_prompts.py --split final                                                      # comparaison 3 prompts (L3)
+python eval/build_error_register.py                                                                # registre d'erreurs (L9)
 ```
+
+### Backends d'inférence
+
+| Backend | Exécution | Rôle |
+|---|---|---|
+| `toy` | partout (défaut) | valide la chaîne (lit le label dans le nom de fichier) |
+| `noisy` | partout | modèle synthétique déterministe → métriques/erreurs réalistes |
+| `vlm` | PC GPU | vrai VLM médical MedGemma/Gemma (voir `docs/guide_execution_gpu.md`) |
+| `classifier` | GPU/CPU | classifieur léger CNN/ViT de support |
+
+Sélection : `predict(path, backend="vlm")`, ou `RADIO_BACKEND=vlm`, ou `--backend`.
 
 ## Smoke test du dépôt
 
@@ -72,25 +94,34 @@ La réponse doit contenir une classe, une confiance, des observations visuelles,
 ```text
 assistant-radiologue-virtuel/
 ├── README.md
-├── docs/          # appel d'offre, architecture, éthique, évaluation
-├── data/          # cas synthétiques et images jouet
-├── prompts/       # prompt baseline, prompt amélioré, schéma JSON
-├── src/           # inférence jouet, garde-fous, métriques, SQLite
-├── api/           # FastAPI
-├── app/           # Streamlit / Gradio
-├── eval/          # évaluation, sorties CSV/JSON, registre d'erreurs
-├── tests/         # smoke tests et contrat minimal
+├── docs/          # cadrage, architecture, éthique, évaluation, mesures, erreurs, GPU, démo
+├── data/          # cas synthétiques (20 smoke + 30 final) + générateur déterministe
+├── prompts/       # 3 prompts comparés (baseline, improved, structured) + schéma JSON
+├── src/           # inférence (toy/noisy/vlm/classifier), garde-fous, métriques, prétraitement, SQLite
+├── api/           # FastAPI /predict + journalisation
+├── app/           # Streamlit (4 onglets) / Gradio
+├── eval/          # run_evaluation, compare_prompts, build_error_register, registre final
+├── tests/         # smoke tests + tests des nouvelles fonctions
 ├── notebooks/     # notebooks de démarrage
-└── finetuning/    # stubs expérimentaux, non obligatoires
+└── finetuning/    # prepare_dataset + Gemma/Unsloth LoRA, MedGemma QLoRA, classifieur léger
 ```
 
-## Livrables attendus
+## Livrables (L1 → L10)
 
-| Niveau | Attendu |
-|---|---|
-| **MUST** | Baseline reproductible, sortie JSON valide, warning obligatoire, logs, métriques, mini-rapport |
-| **SHOULD** | Prompt amélioré, règle d'incertitude, comparaison baseline/amélioration, analyse d'erreurs |
-| **COULD** | LoRA expérimental, MedGemma/PEFT, localisation visuelle, ablations de prompts |
+| # | Livrable | Où |
+|---|---|---|
+| L1 | Note de cadrage (3 classes gelées) | `docs/note_de_cadrage.md` |
+| L2 | Prétraitement (normalisation + anonymisation) | `src/preprocessing.py` |
+| L3 | ≥ 3 prompts comparés | `prompts/`, `eval/compare_prompts.py`, `docs/comparaison_prompts.md` |
+| L4 | Schéma JSON + validateur (≥ 95 %) | `prompts/json_schema.md`, `src/guardrails.py` |
+| L5 | API `/predict` + garde-fous + logs | `api/main.py`, `src/database.py` |
+| L6 | Interface web (4 onglets) | `app/streamlit_app.py` |
+| L7 | 30 cas finaux commentés + CSV/SQLite | `data/`, `eval/error_register_final.csv` |
+| L8 | Rapport de mesures (confusion, 6 métriques, Δ) | `docs/rapport_mesures.md` |
+| L9 | Registre d'analyse d'erreurs (4 types, Top 5) | `docs/analyse_erreurs.md` |
+| L10 | Démonstration (chaîne complète) | `docs/demo.md` |
+
+Mode réel (vrais modèles + données) : `docs/guide_execution_gpu.md`.
 
 ## Références techniques
 

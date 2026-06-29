@@ -1,31 +1,51 @@
 case_id,image_path,source,label,split,quality,notes
-CXR_SYN_001,data/sample_images/CXR_SYN_001_normal.png,synthetic_toy,normal,smoke,good,synthetic normal-like image
-CXR_SYN_002,data/sample_images/CXR_SYN_002_suspected_opacity.png,synthetic_toy,suspected_opacity,smoke,good,synthetic opacity-like patch
-CXR_SYN_003,data/sample_images/CXR_SYN_003_uncertain.png,synthetic_toy,uncertain,smoke,limited,synthetic low-quality ambiguous image
-CXR_SYN_004,data/sample_images/CXR_SYN_004_normal.png,synthetic_toy,normal,smoke,good,synthetic normal-like image
-CXR_SYN_005,data/sample_images/CXR_SYN_005_suspected_opacity.png,synthetic_toy,suspected_opacity,smoke,good,synthetic opacity-like patch
-CXR_SYN_006,data/sample_images/CXR_SYN_006_uncertain.png,synthetic_toy,uncertain,smoke,limited,synthetic low-quality ambiguous image
-CXR_SYN_007,data/sample_images/CXR_SYN_007_normal.png,synthetic_toy,normal,smoke,good,synthetic normal-like image
-CXR_SYN_008,data/sample_images/CXR_SYN_008_suspected_opacity.png,synthetic_toy,suspected_opacity,smoke,good,synthetic opacity-like patch
-CXR_SYN_009,data/sample_images/CXR_SYN_009_uncertain.png,synthetic_toy,uncertain,smoke,limited,synthetic low-quality ambiguous image
-CXR_SYN_010,data/sample_images/CXR_SYN_010_normal.png,synthetic_toy,normal,smoke,good,synthetic normal-like image
-CXR_SYN_011,data/sample_images/CXR_SYN_011_suspected_opacity.png,synthetic_toy,suspected_opacity,smoke,good,synthetic opacity-like patch
-CXR_SYN_012,data/sample_images/CXR_SYN_012_uncertain.png,synthetic_toy,uncertain,smoke,limited,synthetic low-quality ambiguous image
-CXR_SYN_013,data/sample_images/CXR_SYN_013_normal.png,synthetic_toy,normal,smoke,good,synthetic normal-like image
-CXR_SYN_014,data/sample_images/CXR_SYN_014_suspected_opacity.png,synthetic_toy,suspected_opacity,smoke,good,synthetic opacity-like patch
-CXR_SYN_015,data/sample_images/CXR_SYN_015_uncertain.png,synthetic_toy,uncertain,smoke,limited,synthetic low-quality ambiguous image
-CXR_SYN_016,data/sample_images/CXR_SYN_016_normal.png,synthetic_toy,normal,smoke,good,synthetic normal-like image
-CXR_SYN_017,data/sample_images/CXR_SYN_017_suspected_opacity.png,synthetic_toy,suspected_opacity,smoke,good,synthetic opacity-like patch
-CXR_SYN_018,data/sample_images/CXR_SYN_018_uncertain.png,synthetic_toy,uncertain,smoke,limited,synthetic low-quality ambiguous image
-CXR_SYN_019,data/sample_images/CXR_SYN_019_normal.png,synthetic_toy,normal,smoke,good,synthetic normal-like image
-CXR_SYN_020,data/sample_images/CXR_SYN_020_suspected_opacity.png,synthetic_toy,suspected_opacity,smoke,good,synthetic opacity-like patch
-CXR_SYN_021,data/sample_images/CXR_SYN_021_uncertain.png,synthetic_toy,uncertain,final,limited,synthetic low-quality ambiguous image
-CXR_SYN_022,data/sample_images/CXR_SYN_022_normal.png,synthetic_toy,normal,final,good,synthetic normal-like image
-CXR_SYN_023,data/sample_images/CXR_SYN_023_suspected_opacity.png,synthetic_toy,suspected_opacity,final,good,synthetic opacity-like patch
-CXR_SYN_024,data/sample_images/CXR_SYN_024_uncertain.png,synthetic_toy,uncertain,final,limited,synthetic low-quality ambiguous image
-CXR_SYN_025,data/sample_images/CXR_SYN_025_normal.png,synthetic_toy,normal,final,good,synthetic normal-like image
-CXR_SYN_026,data/sample_images/CXR_SYN_026_suspected_opacity.png,synthetic_toy,suspected_opacity,final,good,synthetic opacity-like patch
-CXR_SYN_027,data/sample_images/CXR_SYN_027_uncertain.png,synthetic_toy,uncertain,final,limited,synthetic low-quality ambiguous image
-CXR_SYN_028,data/sample_images/CXR_SYN_028_normal.png,synthetic_toy,normal,final,good,synthetic normal-like image
-CXR_SYN_029,data/sample_images/CXR_SYN_029_suspected_opacity.png,synthetic_toy,suspected_opacity,final,good,synthetic opacity-like patch
-CXR_SYN_030,data/sample_images/CXR_SYN_030_uncertain.png,synthetic_toy,uncertain,final,limited,synthetic low-quality ambiguous image
+CXR_SYN_001,data/sample_images/CXR_SYN_001_normal.png,synthetic_toy,normal,smoke,good,image synthétique d'aspect normal
+CXR_SYN_002,data/sample_images/CXR_SYN_002_suspected_opacity.png,synthetic_toy,suspected_opacity,smoke,good,opacité synthétique localisée dans un champ pulmonaire
+CXR_SYN_003,data/sample_images/CXR_SYN_003_uncertain.png,synthetic_toy,uncertain,smoke,limited,image synthétique ambiguë (qualité dégradée)
+CXR_SYN_004,data/sample_images/CXR_SYN_004_normal.png,synthetic_toy,normal,smoke,good,image synthétique d'aspect normal
+CXR_SYN_005,data/sample_images/CXR_SYN_005_suspected_opacity.png,synthetic_toy,suspected_opacity,smoke,good,opacité synthétique localisée dans un champ pulmonaire
+CXR_SYN_006,data/sample_images/CXR_SYN_006_uncertain.png,synthetic_toy,uncertain,smoke,poor,image synthétique ambiguë (qualité dégradée)
+CXR_SYN_007,data/sample_images/CXR_SYN_007_normal.png,synthetic_toy,normal,smoke,good,image synthétique d'aspect normal
+CXR_SYN_008,data/sample_images/CXR_SYN_008_suspected_opacity.png,synthetic_toy,suspected_opacity,smoke,good,opacité synthétique localisée dans un champ pulmonaire
+CXR_SYN_009,data/sample_images/CXR_SYN_009_uncertain.png,synthetic_toy,uncertain,smoke,limited,image synthétique ambiguë (qualité dégradée)
+CXR_SYN_010,data/sample_images/CXR_SYN_010_normal.png,synthetic_toy,normal,smoke,good,image synthétique d'aspect normal
+CXR_SYN_011,data/sample_images/CXR_SYN_011_suspected_opacity.png,synthetic_toy,suspected_opacity,smoke,good,opacité synthétique localisée dans un champ pulmonaire
+CXR_SYN_012,data/sample_images/CXR_SYN_012_uncertain.png,synthetic_toy,uncertain,smoke,poor,image synthétique ambiguë (qualité dégradée)
+CXR_SYN_013,data/sample_images/CXR_SYN_013_normal.png,synthetic_toy,normal,smoke,good,image synthétique d'aspect normal
+CXR_SYN_014,data/sample_images/CXR_SYN_014_suspected_opacity.png,synthetic_toy,suspected_opacity,smoke,good,opacité synthétique localisée dans un champ pulmonaire
+CXR_SYN_015,data/sample_images/CXR_SYN_015_uncertain.png,synthetic_toy,uncertain,smoke,limited,image synthétique ambiguë (qualité dégradée)
+CXR_SYN_016,data/sample_images/CXR_SYN_016_normal.png,synthetic_toy,normal,smoke,good,image synthétique d'aspect normal
+CXR_SYN_017,data/sample_images/CXR_SYN_017_suspected_opacity.png,synthetic_toy,suspected_opacity,smoke,good,opacité synthétique localisée dans un champ pulmonaire
+CXR_SYN_018,data/sample_images/CXR_SYN_018_uncertain.png,synthetic_toy,uncertain,smoke,poor,image synthétique ambiguë (qualité dégradée)
+CXR_SYN_019,data/sample_images/CXR_SYN_019_normal.png,synthetic_toy,normal,smoke,good,image synthétique d'aspect normal
+CXR_SYN_020,data/sample_images/CXR_SYN_020_suspected_opacity.png,synthetic_toy,suspected_opacity,smoke,good,opacité synthétique localisée dans un champ pulmonaire
+CXR_SYN_021,data/sample_images/CXR_SYN_021_uncertain.png,synthetic_toy,uncertain,final,limited,image synthétique ambiguë (qualité dégradée)
+CXR_SYN_022,data/sample_images/CXR_SYN_022_normal.png,synthetic_toy,normal,final,good,image synthétique d'aspect normal
+CXR_SYN_023,data/sample_images/CXR_SYN_023_suspected_opacity.png,synthetic_toy,suspected_opacity,final,good,opacité synthétique localisée dans un champ pulmonaire
+CXR_SYN_024,data/sample_images/CXR_SYN_024_uncertain.png,synthetic_toy,uncertain,final,poor,image synthétique ambiguë (qualité dégradée)
+CXR_SYN_025,data/sample_images/CXR_SYN_025_normal.png,synthetic_toy,normal,final,good,image synthétique d'aspect normal
+CXR_SYN_026,data/sample_images/CXR_SYN_026_suspected_opacity.png,synthetic_toy,suspected_opacity,final,poor,opacité synthétique localisée dans un champ pulmonaire
+CXR_SYN_027,data/sample_images/CXR_SYN_027_uncertain.png,synthetic_toy,uncertain,final,limited,image synthétique ambiguë (qualité dégradée)
+CXR_SYN_028,data/sample_images/CXR_SYN_028_normal.png,synthetic_toy,normal,final,good,image synthétique d'aspect normal
+CXR_SYN_029,data/sample_images/CXR_SYN_029_suspected_opacity.png,synthetic_toy,suspected_opacity,final,limited,opacité synthétique localisée dans un champ pulmonaire
+CXR_SYN_030,data/sample_images/CXR_SYN_030_uncertain.png,synthetic_toy,uncertain,final,poor,image synthétique ambiguë (qualité dégradée)
+CXR_SYN_031,data/sample_images/CXR_SYN_031_normal.png,synthetic_toy,normal,final,good,image synthétique d'aspect normal
+CXR_SYN_032,data/sample_images/CXR_SYN_032_suspected_opacity.png,synthetic_toy,suspected_opacity,final,good,opacité synthétique localisée dans un champ pulmonaire
+CXR_SYN_033,data/sample_images/CXR_SYN_033_uncertain.png,synthetic_toy,uncertain,final,limited,image synthétique ambiguë (qualité dégradée)
+CXR_SYN_034,data/sample_images/CXR_SYN_034_normal.png,synthetic_toy,normal,final,good,image synthétique d'aspect normal
+CXR_SYN_035,data/sample_images/CXR_SYN_035_suspected_opacity.png,synthetic_toy,suspected_opacity,final,good,opacité synthétique localisée dans un champ pulmonaire
+CXR_SYN_036,data/sample_images/CXR_SYN_036_uncertain.png,synthetic_toy,uncertain,final,poor,image synthétique ambiguë (qualité dégradée)
+CXR_SYN_037,data/sample_images/CXR_SYN_037_normal.png,synthetic_toy,normal,final,good,image synthétique d'aspect normal
+CXR_SYN_038,data/sample_images/CXR_SYN_038_suspected_opacity.png,synthetic_toy,suspected_opacity,final,limited,opacité synthétique localisée dans un champ pulmonaire
+CXR_SYN_039,data/sample_images/CXR_SYN_039_uncertain.png,synthetic_toy,uncertain,final,limited,image synthétique ambiguë (qualité dégradée)
+CXR_SYN_040,data/sample_images/CXR_SYN_040_normal.png,synthetic_toy,normal,final,good,image synthétique d'aspect normal
+CXR_SYN_041,data/sample_images/CXR_SYN_041_suspected_opacity.png,synthetic_toy,suspected_opacity,final,good,opacité synthétique localisée dans un champ pulmonaire
+CXR_SYN_042,data/sample_images/CXR_SYN_042_uncertain.png,synthetic_toy,uncertain,final,poor,image synthétique ambiguë (qualité dégradée)
+CXR_SYN_043,data/sample_images/CXR_SYN_043_normal.png,synthetic_toy,normal,final,good,image synthétique d'aspect normal
+CXR_SYN_044,data/sample_images/CXR_SYN_044_suspected_opacity.png,synthetic_toy,suspected_opacity,final,poor,opacité synthétique localisée dans un champ pulmonaire
+CXR_SYN_045,data/sample_images/CXR_SYN_045_uncertain.png,synthetic_toy,uncertain,final,limited,image synthétique ambiguë (qualité dégradée)
+CXR_SYN_046,data/sample_images/CXR_SYN_046_normal.png,synthetic_toy,normal,final,good,image synthétique d'aspect normal
+CXR_SYN_047,data/sample_images/CXR_SYN_047_suspected_opacity.png,synthetic_toy,suspected_opacity,final,limited,opacité synthétique localisée dans un champ pulmonaire
+CXR_SYN_048,data/sample_images/CXR_SYN_048_uncertain.png,synthetic_toy,uncertain,final,poor,image synthétique ambiguë (qualité dégradée)
+CXR_SYN_049,data/sample_images/CXR_SYN_049_normal.png,synthetic_toy,normal,final,good,image synthétique d'aspect normal
+CXR_SYN_050,data/sample_images/CXR_SYN_050_suspected_opacity.png,synthetic_toy,suspected_opacity,final,good,opacité synthétique localisée dans un champ pulmonaire

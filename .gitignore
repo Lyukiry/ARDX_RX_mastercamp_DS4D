@@ -5,7 +5,10 @@ __pycache__/
 .ipynb_checkpoints/
 tmp_uploads/
 medical_ai_evidence.sqlite
+*.sqlite
 eval/outputs/
+finetuning/data/
+finetuning/outputs/
 .env
 .DS_Store
 

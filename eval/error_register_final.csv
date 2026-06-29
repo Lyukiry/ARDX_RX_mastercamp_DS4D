@@ -1,0 +1,61 @@
+case_id,ground_truth,model,prediction,confidence,quality,error_type,cause,comment,corrective_action
+CXR_SYN_021,uncertain,baseline,normal,0.671,limited,FN,opacité synthétique peu marquée,"vérité uncertain, prédit normal (qualité limited)","Enrichir les données, revoir le seuil, renforcer la sensibilité"
+CXR_SYN_021,uncertain,improved,uncertain,0.519,limited,OK,,"vérité uncertain, prédit uncertain (qualité limited)",Aucune (cas correct)
+CXR_SYN_022,normal,baseline,uncertain,0.459,good,UA,qualité limitée / signes non concluants,"vérité normal, prédit uncertain (qualité good)","Calibrer l'incertitude, affiner les seuils, enrichir le contexte"
+CXR_SYN_022,normal,improved,normal,0.826,good,OK,,"vérité normal, prédit normal (qualité good)",Aucune (cas correct)
+CXR_SYN_023,suspected_opacity,baseline,suspected_opacity,0.811,good,OK,,"vérité suspected_opacity, prédit suspected_opacity (qualité good)",Aucune (cas correct)
+CXR_SYN_023,suspected_opacity,improved,suspected_opacity,0.721,good,OK,,"vérité suspected_opacity, prédit suspected_opacity (qualité good)",Aucune (cas correct)
+CXR_SYN_024,uncertain,baseline,uncertain,0.454,poor,OK,,"vérité uncertain, prédit uncertain (qualité poor)",Aucune (cas correct)
+CXR_SYN_024,uncertain,improved,uncertain,0.572,poor,OK,,"vérité uncertain, prédit uncertain (qualité poor)",Aucune (cas correct)
+CXR_SYN_025,normal,baseline,normal,0.798,good,OK,,"vérité normal, prédit normal (qualité good)",Aucune (cas correct)
+CXR_SYN_025,normal,improved,normal,0.775,good,OK,,"vérité normal, prédit normal (qualité good)",Aucune (cas correct)
+CXR_SYN_026,suspected_opacity,baseline,normal,0.616,poor,HT,texte inventé (mention non présente sur l'image),"vérité suspected_opacity, prédit normal (qualité poor)","Contraindre la génération, prompt « pas d'invention », garde-fous"
+CXR_SYN_026,suspected_opacity,improved,suspected_opacity,0.873,poor,OK,,"vérité suspected_opacity, prédit suspected_opacity (qualité poor)",Aucune (cas correct)
+CXR_SYN_027,uncertain,baseline,normal,0.62,limited,FN,opacité synthétique peu marquée,"vérité uncertain, prédit normal (qualité limited)","Enrichir les données, revoir le seuil, renforcer la sensibilité"
+CXR_SYN_027,uncertain,improved,uncertain,0.58,limited,OK,,"vérité uncertain, prédit uncertain (qualité limited)",Aucune (cas correct)
+CXR_SYN_028,normal,baseline,suspected_opacity,0.68,good,FP,structure normale sur-interprétée,"vérité normal, prédit suspected_opacity (qualité good)","Réduire les faux signaux, ajuster le seuil, améliorer la spécificité"
+CXR_SYN_028,normal,improved,normal,0.884,good,OK,,"vérité normal, prédit normal (qualité good)",Aucune (cas correct)
+CXR_SYN_029,suspected_opacity,baseline,normal,0.619,limited,FN,opacité synthétique peu marquée,"vérité suspected_opacity, prédit normal (qualité limited)","Enrichir les données, revoir le seuil, renforcer la sensibilité"
+CXR_SYN_029,suspected_opacity,improved,suspected_opacity,0.798,limited,OK,,"vérité suspected_opacity, prédit suspected_opacity (qualité limited)",Aucune (cas correct)
+CXR_SYN_030,uncertain,baseline,uncertain,0.473,poor,HT,texte inventé (mention non présente sur l'image),"vérité uncertain, prédit uncertain (qualité poor)","Contraindre la génération, prompt « pas d'invention », garde-fous"
+CXR_SYN_030,uncertain,improved,uncertain,0.535,poor,OK,,"vérité uncertain, prédit uncertain (qualité poor)",Aucune (cas correct)
+CXR_SYN_031,normal,baseline,normal,0.8,good,OK,,"vérité normal, prédit normal (qualité good)",Aucune (cas correct)
+CXR_SYN_031,normal,improved,uncertain,0.462,good,UA,qualité limitée / signes non concluants,"vérité normal, prédit uncertain (qualité good)","Calibrer l'incertitude, affiner les seuils, enrichir le contexte"
+CXR_SYN_032,suspected_opacity,baseline,suspected_opacity,0.673,good,OK,,"vérité suspected_opacity, prédit suspected_opacity (qualité good)",Aucune (cas correct)
+CXR_SYN_032,suspected_opacity,improved,suspected_opacity,0.886,good,OK,,"vérité suspected_opacity, prédit suspected_opacity (qualité good)",Aucune (cas correct)
+CXR_SYN_033,uncertain,baseline,normal,0.644,limited,FN,opacité synthétique peu marquée,"vérité uncertain, prédit normal (qualité limited)","Enrichir les données, revoir le seuil, renforcer la sensibilité"
+CXR_SYN_033,uncertain,improved,uncertain,0.452,limited,OK,,"vérité uncertain, prédit uncertain (qualité limited)",Aucune (cas correct)
+CXR_SYN_034,normal,baseline,normal,0.8,good,OK,,"vérité normal, prédit normal (qualité good)",Aucune (cas correct)
+CXR_SYN_034,normal,improved,normal,0.838,good,OK,,"vérité normal, prédit normal (qualité good)",Aucune (cas correct)
+CXR_SYN_035,suspected_opacity,baseline,suspected_opacity,0.78,good,OK,,"vérité suspected_opacity, prédit suspected_opacity (qualité good)",Aucune (cas correct)
+CXR_SYN_035,suspected_opacity,improved,suspected_opacity,0.787,good,OK,,"vérité suspected_opacity, prédit suspected_opacity (qualité good)",Aucune (cas correct)
+CXR_SYN_036,uncertain,baseline,suspected_opacity,0.652,poor,FP,artefact pris pour une opacité,"vérité uncertain, prédit suspected_opacity (qualité poor)","Réduire les faux signaux, ajuster le seuil, améliorer la spécificité"
+CXR_SYN_036,uncertain,improved,uncertain,0.508,poor,OK,,"vérité uncertain, prédit uncertain (qualité poor)",Aucune (cas correct)
+CXR_SYN_037,normal,baseline,normal,0.747,good,OK,,"vérité normal, prédit normal (qualité good)",Aucune (cas correct)
+CXR_SYN_037,normal,improved,normal,0.721,good,OK,,"vérité normal, prédit normal (qualité good)",Aucune (cas correct)
+CXR_SYN_038,suspected_opacity,baseline,suspected_opacity,0.673,limited,OK,,"vérité suspected_opacity, prédit suspected_opacity (qualité limited)",Aucune (cas correct)
+CXR_SYN_038,suspected_opacity,improved,uncertain,0.55,limited,UA,qualité limitée / signes non concluants,"vérité suspected_opacity, prédit uncertain (qualité limited)","Calibrer l'incertitude, affiner les seuils, enrichir le contexte"
+CXR_SYN_039,uncertain,baseline,suspected_opacity,0.708,limited,FP,artefact pris pour une opacité,"vérité uncertain, prédit suspected_opacity (qualité limited)","Réduire les faux signaux, ajuster le seuil, améliorer la spécificité"
+CXR_SYN_039,uncertain,improved,uncertain,0.571,limited,OK,,"vérité uncertain, prédit uncertain (qualité limited)",Aucune (cas correct)
+CXR_SYN_040,normal,baseline,normal,0.672,good,OK,,"vérité normal, prédit normal (qualité good)",Aucune (cas correct)
+CXR_SYN_040,normal,improved,uncertain,0.504,good,UA,qualité limitée / signes non concluants,"vérité normal, prédit uncertain (qualité good)","Calibrer l'incertitude, affiner les seuils, enrichir le contexte"
+CXR_SYN_041,suspected_opacity,baseline,normal,0.638,good,FN,opacité synthétique peu marquée,"vérité suspected_opacity, prédit normal (qualité good)","Enrichir les données, revoir le seuil, renforcer la sensibilité"
+CXR_SYN_041,suspected_opacity,improved,suspected_opacity,0.774,good,OK,,"vérité suspected_opacity, prédit suspected_opacity (qualité good)",Aucune (cas correct)
+CXR_SYN_042,uncertain,baseline,normal,0.63,poor,FN,opacité masquée par mauvaise qualité,"vérité uncertain, prédit normal (qualité poor)","Enrichir les données, revoir le seuil, renforcer la sensibilité"
+CXR_SYN_042,uncertain,improved,uncertain,0.577,poor,OK,,"vérité uncertain, prédit uncertain (qualité poor)",Aucune (cas correct)
+CXR_SYN_043,normal,baseline,normal,0.801,good,OK,,"vérité normal, prédit normal (qualité good)",Aucune (cas correct)
+CXR_SYN_043,normal,improved,normal,0.87,good,OK,,"vérité normal, prédit normal (qualité good)",Aucune (cas correct)
+CXR_SYN_044,suspected_opacity,baseline,suspected_opacity,0.748,poor,OK,,"vérité suspected_opacity, prédit suspected_opacity (qualité poor)",Aucune (cas correct)
+CXR_SYN_044,suspected_opacity,improved,normal,0.616,poor,FN,opacité masquée par mauvaise qualité,"vérité suspected_opacity, prédit normal (qualité poor)","Enrichir les données, revoir le seuil, renforcer la sensibilité"
+CXR_SYN_045,uncertain,baseline,uncertain,0.557,limited,OK,,"vérité uncertain, prédit uncertain (qualité limited)",Aucune (cas correct)
+CXR_SYN_045,uncertain,improved,uncertain,0.512,limited,OK,,"vérité uncertain, prédit uncertain (qualité limited)",Aucune (cas correct)
+CXR_SYN_046,normal,baseline,suspected_opacity,0.686,good,FP,structure normale sur-interprétée,"vérité normal, prédit suspected_opacity (qualité good)","Réduire les faux signaux, ajuster le seuil, améliorer la spécificité"
+CXR_SYN_046,normal,improved,normal,0.741,good,OK,,"vérité normal, prédit normal (qualité good)",Aucune (cas correct)
+CXR_SYN_047,suspected_opacity,baseline,normal,0.601,limited,FN,opacité synthétique peu marquée,"vérité suspected_opacity, prédit normal (qualité limited)","Enrichir les données, revoir le seuil, renforcer la sensibilité"
+CXR_SYN_047,suspected_opacity,improved,suspected_opacity,0.749,limited,OK,,"vérité suspected_opacity, prédit suspected_opacity (qualité limited)",Aucune (cas correct)
+CXR_SYN_048,uncertain,baseline,uncertain,0.543,poor,OK,,"vérité uncertain, prédit uncertain (qualité poor)",Aucune (cas correct)
+CXR_SYN_048,uncertain,improved,uncertain,0.556,poor,OK,,"vérité uncertain, prédit uncertain (qualité poor)",Aucune (cas correct)
+CXR_SYN_049,normal,baseline,normal,0.665,good,OK,,"vérité normal, prédit normal (qualité good)",Aucune (cas correct)
+CXR_SYN_049,normal,improved,normal,0.797,good,OK,,"vérité normal, prédit normal (qualité good)",Aucune (cas correct)
+CXR_SYN_050,suspected_opacity,baseline,suspected_opacity,0.771,good,OK,,"vérité suspected_opacity, prédit suspected_opacity (qualité good)",Aucune (cas correct)
+CXR_SYN_050,suspected_opacity,improved,suspected_opacity,0.752,good,OK,,"vérité suspected_opacity, prédit suspected_opacity (qualité good)",Aucune (cas correct)

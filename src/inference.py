@@ -1,18 +1,27 @@
 from __future__ import annotations
 
-from pathlib import Path
+import os
 import time
+from pathlib import Path
 from typing import Any
 
 from .preprocessing import basic_quality_flag
 
 WARNING = "Prototype pédagogique. Non destiné au diagnostic. Validation par un professionnel qualifié requise."
 
+# Backends d'inférence disponibles.
+#   toy        : déterministe, lit le label dans le nom de fichier (parfait, CI/Mac).
+#   noisy      : synthétique imparfait mais reproductible (métriques/erreurs réalistes).
+#   vlm        : vrai VLM médical (MedGemma / Gemma), imports paresseux, GPU requis.
+#   classifier : classifieur léger CNN/ViT, imports paresseux, GPU/CPU.
+BACKENDS = ("toy", "noisy", "vlm", "classifier")
+
 
 def toy_predict(image_path: str | Path, mode: str = "baseline") -> dict[str, Any]:
-    """Deterministic toy predictor used to validate the repo pipeline.
+    """Prédicteur jouet déterministe pour valider la chaîne du dépôt.
 
-    It reads synthetic labels from filenames. This is not medical inference.
+    Lit le label synthétique depuis le nom de fichier. Ce n'est pas une
+    inférence médicale : il sert uniquement à prouver que le pipeline tourne.
     """
     start = time.perf_counter()
     name = Path(image_path).name.lower()
@@ -34,7 +43,7 @@ def toy_predict(image_path: str | Path, mode: str = "baseline") -> dict[str, Any
         evidence = ["limited synthetic image quality"]
         justification = "The image is treated as limited quality in the toy catalog. The safe output is uncertainty rather than a forced class."
 
-    # Improved mode is more conservative.
+    # Le mode amélioré est plus prudent : doute si la qualité n'est pas bonne.
     if mode == "improved" and quality != "good":
         pred = "uncertain"
         conf = min(conf, 0.55)
@@ -54,9 +63,35 @@ def toy_predict(image_path: str | Path, mode: str = "baseline") -> dict[str, Any
     }
 
 
-def vlm_predict_placeholder(image_path: str | Path, prompt: str) -> dict[str, Any]:
-    """Placeholder for a Hugging Face / MedGemma / Gemma 4 VLM call.
+def predict(
+    image_path: str | Path,
+    *,
+    backend: str | None = None,
+    mode: str = "baseline",
+    case: dict[str, Any] | None = None,
+    seed: int | None = None,
+) -> dict[str, Any]:
+    """Aiguilleur d'inférence : choisit le backend (toy/noisy/vlm/classifier).
 
-    Students should keep the same output schema as toy_predict.
+    Le backend est résolu par l'argument `backend`, puis la variable
+    d'environnement `RADIO_BACKEND`, puis `toy` par défaut. Toutes les sorties
+    respectent le même schéma JSON à 7 champs.
     """
-    return toy_predict(image_path, mode="baseline")
+    backend = (backend or os.environ.get("RADIO_BACKEND", "toy")).lower()
+
+    if backend == "toy":
+        return toy_predict(image_path, mode=mode)
+    if backend == "noisy":
+        from .synthetic_eval import DEFAULT_SEED, case_from_image, noisy_predict
+        return noisy_predict(
+            case or case_from_image(image_path),
+            mode=mode,
+            seed=DEFAULT_SEED if seed is None else seed,
+        )
+    if backend == "vlm":
+        from .vlm_inference import vlm_predict  # import paresseux (torch/transformers)
+        return vlm_predict(image_path, mode=mode)
+    if backend == "classifier":
+        from .classifier import classifier_predict  # import paresseux (torch)
+        return classifier_predict(image_path)
+    raise ValueError(f"Backend inconnu : {backend!r} (attendu : {BACKENDS})")
