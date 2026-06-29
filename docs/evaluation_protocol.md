@@ -5,10 +5,27 @@
 ## Jeux de cas
 
 - `smoke` : 20 images pour vérifier la chaîne.
-- `dev` : 100 à 150 cas si un vrai dataset est utilisé.
-- `final` : 20 à 30 cas commentés pour la soutenance.
+- `dev` : 100 à 150 cas si un vrai dataset est utilisé (RSNA, sur PC GPU).
+- `final` : **30 cas commentés** pour les mesures et l'analyse d'erreurs.
 
-Le jeu synthétique fourni sert uniquement à valider le pipeline logiciel : chargement, inférence jouet, JSON, logs, métriques et garde-fous. Un score parfait sur ce jeu ne constitue pas une performance médicale.
+Le jeu synthétique fourni sert uniquement à valider le pipeline logiciel : chargement, inférence, JSON, logs, métriques et garde-fous. Un score sur ce jeu ne constitue pas une performance médicale.
+
+## Backends et reproductibilité
+
+- `toy` : déterministe, parfait par construction (valide la chaîne).
+- `noisy` : modèle synthétique imparfait mais **déterministe** (graine 203) — produit
+  une matrice de confusion, un tableau Δ et un registre d'erreurs réalistes.
+- `vlm` / `classifier` : vrais modèles, sur PC GPU (voir `docs/guide_execution_gpu.md`).
+
+```bash
+python eval/run_evaluation.py --mode toy --backend noisy --split final \
+    --out-dir /tmp/eval --db-path /tmp/runs.sqlite
+python eval/compare_prompts.py --split final
+python eval/build_error_register.py
+```
+
+Résultats détaillés : `docs/rapport_mesures.md` (L8), `docs/analyse_erreurs.md` (L9),
+`docs/comparaison_prompts.md` (L3).
 
 ## Métriques minimales
 

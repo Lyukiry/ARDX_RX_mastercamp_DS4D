@@ -32,10 +32,13 @@ Ne jamais stocker : nom, prénom, date de naissance, identifiant patient réel, 
 ## Garde-fous fonctionnels
 
 - Classe `uncertain` si qualité image faible ou signes insuffisants.
+- **Escalade d'incertitude (§7.2)** : champ `uncertainty_warning` rempli dès que
+  `confidence < 0.60` OU `image_quality = mauvaise`. L'avertissement non clinique
+  (`warning`), lui, est **inconditionnel** (présent sur 100 % des sorties).
 - Refus des conclusions définitives.
-- Contrôle de validité JSON.
-- Limitation de la justification aux observations visibles.
-- Journalisation des prompts, modèles, sorties et latences.
+- Contrôle de validité JSON (validateur strict + bascule en `uncertain` si invalide).
+- Limitation de la justification aux observations visibles (« pas d'invention »).
+- Journalisation des prompts, modèles, sorties et latences (SQLite).
 
 ## Limites à documenter
 
