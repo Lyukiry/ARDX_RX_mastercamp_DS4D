@@ -88,7 +88,7 @@ def load_model(model_id: str | None = None):
     model = AutoModelForImageTextToText.from_pretrained(
         model_id,
         torch_dtype=torch.bfloat16,
-        device_map="auto",
+        device_map={"": 0},  # force all layers to GPU 0; "auto" leaves some on meta with accelerate>=1.14
     )
     model.eval()
     _MODEL_CACHE[model_id] = (processor, model)
