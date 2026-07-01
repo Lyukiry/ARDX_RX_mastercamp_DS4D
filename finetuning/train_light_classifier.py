@@ -13,9 +13,11 @@ from __future__ import annotations
 
 import argparse
 import csv
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))  # accès à src/ quand lancé par `python finetuning/...`
 CLASSES = ["normal", "suspected_opacity", "uncertain"]
 
 
@@ -51,7 +53,13 @@ def main() -> None:
 
         def __getitem__(self, index: int):
             row = self.rows[index]
-            image = Image.open(ROOT / row["image_path"]).convert("RGB")
+            path = ROOT / row["image_path"]
+            if path.suffix.lower() in {".dcm", ".dicom"}:
+                # DICOM (ex. RSNA) : conversion + anonymisation via src/preprocessing.
+                from src.preprocessing import dicom_to_image
+                image = dicom_to_image(path).convert("RGB")
+            else:
+                image = Image.open(path).convert("RGB")
             return self.transform(image), CLASSES.index(row["label"])
 
     device = "cuda" if torch.cuda.is_available() else "cpu"

@@ -18,8 +18,18 @@ from .guardrails import WARNING_TEXT
 
 CLASSES = ["normal", "suspected_opacity", "uncertain"]
 DEFAULT_BACKBONE = os.environ.get("RADIO_CLASSIFIER_BACKBONE", "resnet18")
-DEFAULT_CKPT = os.environ.get("RADIO_CLASSIFIER_CKPT", "")
+ROOT = Path(__file__).resolve().parents[1]
+# Sortie standard de finetuning/train_light_classifier.py, utilisée si présente.
+TRAINED_CKPT = ROOT / "finetuning" / "outputs" / "light_classifier.pt"
 IMG_SIZE = 224
+
+
+def _default_ckpt() -> str:
+    """Checkpoint : RADIO_CLASSIFIER_CKPT prioritaire, sinon la sortie standard."""
+    env = os.environ.get("RADIO_CLASSIFIER_CKPT", "")
+    if env:
+        return env
+    return str(TRAINED_CKPT) if TRAINED_CKPT.exists() else ""
 
 _MODEL_CACHE: dict[str, Any] = {}
 
@@ -30,11 +40,27 @@ def build_model(backbone: str = DEFAULT_BACKBONE, num_classes: int = len(CLASSES
         import timm
     except ImportError as exc:  # pragma: no cover - dépend du PC GPU
         raise RuntimeError("Le backend `classifier` requiert timm + torch.") from exc
-    return timm.create_model(backbone, pretrained=True, num_classes=num_classes)
+    try:
+        return timm.create_model(backbone, pretrained=True, num_classes=num_classes)
+    except Exception:
+        # Hub inaccessible (réseau coupé, client HTTP global fermé par une
+        # requête interrompue...) : retenter hors-ligne sur le cache local,
+        # sinon backbone non pré-entraîné (la sortie reste prudente).
+        from huggingface_hub import constants as hf_constants
+
+        previous = hf_constants.HF_HUB_OFFLINE
+        hf_constants.HF_HUB_OFFLINE = True
+        try:
+            return timm.create_model(backbone, pretrained=True, num_classes=num_classes)
+        except Exception:
+            return timm.create_model(backbone, pretrained=False, num_classes=num_classes)
+        finally:
+            hf_constants.HF_HUB_OFFLINE = previous
 
 
-def load_classifier(backbone: str = DEFAULT_BACKBONE, ckpt: str = DEFAULT_CKPT):
+def load_classifier(backbone: str = DEFAULT_BACKBONE, ckpt: str | None = None):
     """Charge (et met en cache) le classifieur et ses transforms."""
+    ckpt = _default_ckpt() if ckpt is None else ckpt
     cache_key = f"{backbone}:{ckpt}"
     if cache_key in _MODEL_CACHE:
         return _MODEL_CACHE[cache_key]

@@ -13,6 +13,7 @@ import pandas as pd
 import streamlit as st
 from PIL import Image
 
+from src.cnn_model import TRAINED_CKPT as CNN_CKPT
 from src.database import connect, init_db, insert_run
 from src.guardrails import UNCERTAINTY_WARNING_TEXT, WARNING_TEXT, apply_safety_guardrails
 from src.inference import predict
@@ -21,6 +22,7 @@ from src.synthetic_eval import MODES, noisy_predict
 
 ROOT = Path(__file__).resolve().parents[1]
 CASES_CSV = ROOT / "data" / "synthetic_cases.csv"
+RSNA_CSV = ROOT / "data" / "rsna_cases.csv"
 DB_PATH = Path(os.environ.get("RADIO_DB_PATH", Path(tempfile.gettempdir()) / "assistant_radio_runs.sqlite"))
 
 # Intitulés français affichés (clés internes anglaises stables).
@@ -71,8 +73,8 @@ def show_prediction(prediction: dict) -> None:
         st.json(prediction)
 
 
-tab_cas, tab_analyse, tab_apprentissage, tab_suivi = st.tabs(
-    ["Cas", "Analyse", "Apprentissage", "Suivi"]
+tab_cas, tab_analyse, tab_apprentissage, tab_metriques, tab_cnn, tab_suivi = st.tabs(
+    ["Cas", "Analyse", "Apprentissage", "Métriques", "CNN", "Suivi"]
 )
 
 # ---------------------------------------------------------------- Onglet Cas
@@ -96,8 +98,8 @@ with tab_cas:
 with tab_analyse:
     st.subheader("Analyser une radiographie")
     backend = st.selectbox(
-        "Backend", ["toy", "noisy", "vlm", "classifier"],
-        help="toy/noisy tournent partout. vlm/classifier nécessitent un GPU + RADIO_BACKEND.",
+        "Backend", ["toy", "noisy", "vlm", "classifier", "cnn"],
+        help="toy/noisy tournent partout. vlm/classifier/cnn nécessitent torch (GPU conseillé).",
     )
     mode = st.selectbox("Prompt / mode", list(MODES))
     source = st.radio(
@@ -173,7 +175,10 @@ with tab_analyse:
                 st.warning(f"Aperçu indisponible : {exc}")
         with col_res:
             try:
-                show_prediction(run_prediction(Path(image_path), backend, mode, case))
+                with st.spinner(f"Analyse en cours (backend « {backend} ») — le premier appel "
+                                "charge le modèle, cela peut prendre quelques minutes…"):
+                    prediction = run_prediction(Path(image_path), backend, mode, case)
+                show_prediction(prediction)
             except Exception as exc:
                 st.error(f"Backend « {backend} » indisponible : {exc}\n\n"
                          "Les backends `vlm`/`classifier` nécessitent le GPU + les dépendances "
@@ -204,6 +209,181 @@ with tab_apprentissage:
     st.table(pd.DataFrame(comparison))
     st.caption("Indicateurs mesurés sur la sortie brute du modèle, avant garde-fous. "
                "En production, les garde-fous portent JSON valide et avertissement à 100 %.")
+
+# --------------------------------------------------------- Onglet Métriques
+with tab_metriques:
+    st.subheader("Métriques par backend × prompt — chacun sur ses données")
+    st.caption(
+        "`toy` / `noisy` sont évalués sur le **jeu synthétique** (validation logicielle) ; "
+        "`vlm` / `classifier` sur le **jeu réel RSNA** (`data/rsna_cases.csv`). "
+        "Un score sur le jeu synthétique ne constitue pas une performance médicale."
+    )
+
+    BACKEND_DATA = {
+        "toy": ("synthétique", CASES_CSV),
+        "noisy": ("synthétique", CASES_CSV),
+        "vlm": ("RSNA", RSNA_CSV),
+        "classifier": ("RSNA", RSNA_CSV),
+        "cnn": ("RSNA", RSNA_CSV),
+    }
+    col_a, col_b, col_c = st.columns(3)
+    with col_a:
+        sel_backends = st.multiselect("Backends", list(BACKEND_DATA),
+                                      default=["toy", "noisy", "classifier", "cnn"])
+    with col_b:
+        sel_modes = st.multiselect("Prompts (toy/noisy/vlm)", list(MODES), default=list(MODES))
+    with col_c:
+        sel_split = st.selectbox("Split", ["final", "dev", "smoke", "all"], index=0,
+                                 help="synthétique : smoke/final — RSNA : dev/final")
+    max_cases = st.slider("Nombre max de cas par évaluation", 5, 150, 30, step=5)
+    if "vlm" in sel_backends:
+        st.info("Backend `vlm` : comptez ~30-60 s par cas (le premier appel charge le modèle).")
+
+    if st.button("Calculer les métriques", type="primary"):
+        # Préparer les (backend, prompt, cas) — le classifieur n'utilise pas de prompt.
+        prepared = []
+        for bk in sel_backends:
+            data_label, csv_path = BACKEND_DATA[bk]
+            if not csv_path.exists():
+                st.warning(f"`{bk}` : fichier absent ({csv_path.name}). "
+                           "Préparer le dataset RSNA : `python data/make_rsna_cases.py`.")
+                continue
+            df_bk = pd.read_csv(csv_path)
+            if sel_split != "all":
+                df_bk = df_bk[df_bk["split"] == sel_split]
+            cases_bk = df_bk.head(max_cases).to_dict("records")
+            if not cases_bk:
+                st.warning(f"`{bk}` : aucun cas {data_label} pour le split « {sel_split} ».")
+                continue
+            for prompt_mode in (sel_modes if bk != "classifier" else ["—"]):
+                prepared.append((bk, prompt_mode, data_label, cases_bk))
+
+        results, matrices = [], {}
+        total = sum(len(p[3]) for p in prepared)
+        done = 0
+        progress = st.progress(0.0, text="Préparation…") if total else None
+        for bk, prompt_mode, data_label, cases_bk in prepared:
+            rows = []
+            try:
+                for c in cases_bk:
+                    pred = apply_safety_guardrails(predict(
+                        ROOT / c["image_path"], backend=bk,
+                        mode=(prompt_mode if prompt_mode != "—" else "improved"), case=c,
+                    ))
+                    rows.append({
+                        "label": c["label"],
+                        "predicted_class": pred["predicted_class"],
+                        "json_valid": pred.get("raw_json_valid", True),
+                        "warning": pred.get("warning"),
+                        "latency_ms": pred.get("latency_ms", 0),
+                    })
+                    done += 1
+                    progress.progress(done / total, text=f"{bk} · {prompt_mode} — {done}/{total}")
+            except Exception as exc:
+                st.warning(f"Backend `{bk}` indisponible : {exc}")
+                done += len(cases_bk) - len(rows)
+                continue
+            results.append({"Backend": bk, "Prompt": prompt_mode, "Données": data_label,
+                            **summarize_metrics(rows)})
+            matrices[f"{bk} · {prompt_mode} ({data_label})"] = confusion_matrix(
+                [r["label"] for r in rows], [r["predicted_class"] for r in rows])
+        if progress:
+            progress.empty()
+        st.session_state["metrics_results"] = (results, matrices)
+
+    if st.session_state.get("metrics_results"):
+        results, matrices = st.session_state["metrics_results"]
+        if results:
+            table = pd.DataFrame(results).rename(columns={
+                "n": "Cas", "accuracy": "Exactitude", "macro_f1": "Macro-F1",
+                "sensitivity": "Sensibilité", "specificity": "Spécificité",
+                "json_valid_rate": "JSON valide", "warning_rate": "Avertissement",
+                "uncertain_rate": "Taux incertain", "median_latency_ms": "Latence méd. (ms)",
+            })
+            st.dataframe(table, use_container_width=True, hide_index=True)
+            st.download_button("Télécharger le tableau (CSV)",
+                               table.to_csv(index=False).encode("utf-8"),
+                               file_name="metriques_backends.csv", mime="text/csv")
+            st.markdown("**Matrices de confusion** — classe réelle en ligne, prédite en colonne")
+            for key, cm in matrices.items():
+                with st.expander(key):
+                    st.table(pd.DataFrame(cm).T.rename(index=CLASS_FR, columns=CLASS_FR))
+            st.caption("Sorties mesurées **après garde-fous** (JSON valide et avertissement "
+                       "sont donc à 100 % ; `raw_json_valid` du backend noisy reflète la "
+                       "sortie brute). La latence du premier cas `vlm` inclut le chargement.")
+
+# --------------------------------------------------------------- Onglet CNN
+with tab_cnn:
+    st.subheader("CNN maison — deep learning from scratch (PyTorch)")
+    st.caption(
+        "Contrairement au backend `classifier` (backbone timm **pré-entraîné** ImageNet), "
+        "ce CNN est défini et entraîné **entièrement dans le projet** : 4 blocs "
+        "convolution → batch-norm → ReLU → max-pooling (32→64→128→256 canaux), "
+        "pooling global et tête linéaire à 3 classes. Entrée : radiographie en "
+        "niveaux de gris 224×224, prétraitement L2 (anonymisation incluse)."
+    )
+
+    if CNN_CKPT.exists():
+        st.success(f"Checkpoint entraîné détecté : `{CNN_CKPT.relative_to(ROOT)}` "
+                   "(entraîné sur RSNA `dev` + synthétique `smoke`).")
+    else:
+        st.warning("Aucun checkpoint : le backend `cnn` répondra prudemment `uncertain`. "
+                   "Entraîner d'abord le modèle :")
+        st.code("python finetuning/train_cnn.py", language="bash")
+
+    st.markdown("**Évaluation sur les cas `final` (jamais vus à l'entraînement) : "
+                "images de synthèse ET images réelles RSNA.**")
+    cnn_max = st.slider("Nombre max de cas par jeu", 5, 30, 30, step=5, key="cnn_max")
+
+    if st.button("Évaluer le CNN sur les deux jeux", type="primary"):
+        datasets = [("synthétique (jouet)", CASES_CSV), ("RSNA (réel)", RSNA_CSV)]
+        results, matrices = [], {}
+        for data_label, csv_path in datasets:
+            if not csv_path.exists():
+                st.warning(f"{data_label} : fichier absent ({csv_path.name}).")
+                continue
+            df_cnn = pd.read_csv(csv_path)
+            cases_cnn = df_cnn[df_cnn["split"] == "final"].head(cnn_max).to_dict("records")
+            rows = []
+            bar = st.progress(0.0, text=data_label)
+            try:
+                for i, c in enumerate(cases_cnn, start=1):
+                    pred = apply_safety_guardrails(
+                        predict(ROOT / c["image_path"], backend="cnn", case=c))
+                    rows.append({"label": c["label"], "predicted_class": pred["predicted_class"],
+                                 "json_valid": True, "warning": pred.get("warning"),
+                                 "latency_ms": pred.get("latency_ms", 0)})
+                    bar.progress(i / len(cases_cnn), text=f"{data_label} — {i}/{len(cases_cnn)}")
+            except Exception as exc:
+                st.error(f"Backend `cnn` indisponible : {exc}")
+                break
+            finally:
+                bar.empty()
+            results.append({"Données": data_label, **summarize_metrics(rows)})
+            matrices[data_label] = confusion_matrix(
+                [r["label"] for r in rows], [r["predicted_class"] for r in rows])
+        st.session_state["cnn_results"] = (results, matrices)
+
+    if st.session_state.get("cnn_results"):
+        results, matrices = st.session_state["cnn_results"]
+        if results:
+            table = pd.DataFrame(results).rename(columns={
+                "n": "Cas", "accuracy": "Exactitude", "macro_f1": "Macro-F1",
+                "sensitivity": "Sensibilité", "specificity": "Spécificité",
+                "json_valid_rate": "JSON valide", "warning_rate": "Avertissement",
+                "uncertain_rate": "Taux incertain", "median_latency_ms": "Latence méd. (ms)",
+            })
+            st.dataframe(table, use_container_width=True, hide_index=True)
+            st.markdown("**Matrices de confusion** — classe réelle en ligne, prédite en colonne")
+            for key, cm in matrices.items():
+                with st.expander(key):
+                    st.table(pd.DataFrame(cm).T.rename(index=CLASS_FR, columns=CLASS_FR))
+            st.caption(
+                "Lecture attendue : bon comportement sur RSNA (données du même domaine que "
+                "l'entraînement), plus fragile sur le jeu synthétique — illustre la "
+                "**sensibilité au changement de domaine**, à commenter dans le rapport. "
+                "Garde-fous appliqués : confiance < 0.60 → `uncertain`."
+            )
 
 # ------------------------------------------------------------- Onglet Suivi
 with tab_suivi:

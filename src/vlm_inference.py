@@ -71,6 +71,18 @@ def _coerce_schema(raw: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _use_4bit(torch) -> bool:
+    """Quantification 4-bit : forcée par RADIO_VLM_4BIT, sinon auto si VRAM < 10 Go.
+
+    MedGemma 4B pèse ~8,6 Go en bf16 : sur une carte de 8 Go (ex. RTX 3070), le
+    chargement plein déborde en mémoire partagée WDDM et devient inutilisable.
+    """
+    flag = os.environ.get("RADIO_VLM_4BIT", "").strip().lower()
+    if flag:
+        return flag not in {"0", "false", "no"}
+    return torch.cuda.is_available() and torch.cuda.get_device_properties(0).total_memory < 10 * 1024**3
+
+
 def load_model(model_id: str | None = None):
     """Charge (et met en cache) le processeur et le modèle VLM. Imports paresseux."""
     model_id = model_id or DEFAULT_MODEL
@@ -85,11 +97,19 @@ def load_model(model_id: str | None = None):
         ) from exc
 
     processor = AutoProcessor.from_pretrained(model_id)
-    model = AutoModelForImageTextToText.from_pretrained(
-        model_id,
-        torch_dtype=torch.bfloat16,
-        device_map={"": 0},  # force all layers to GPU 0; "auto" leaves some on meta with accelerate>=1.14
-    )
+    load_kwargs: dict[str, Any] = {
+        "dtype": torch.bfloat16,
+        "device_map": {"": 0},  # force all layers to GPU 0; "auto" leaves some on meta with accelerate>=1.14
+    }
+    if _use_4bit(torch):
+        from transformers import BitsAndBytesConfig
+
+        load_kwargs["quantization_config"] = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_compute_dtype=torch.bfloat16,
+        )
+    model = AutoModelForImageTextToText.from_pretrained(model_id, **load_kwargs)
     model.eval()
     _MODEL_CACHE[model_id] = (processor, model)
     return processor, model

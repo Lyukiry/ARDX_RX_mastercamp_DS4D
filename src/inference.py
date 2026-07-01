@@ -13,8 +13,9 @@ WARNING = "Prototype pédagogique. Non destiné au diagnostic. Validation par un
 #   toy        : déterministe, lit le label dans le nom de fichier (parfait, CI/Mac).
 #   noisy      : synthétique imparfait mais reproductible (métriques/erreurs réalistes).
 #   vlm        : vrai VLM médical (MedGemma / Gemma), imports paresseux, GPU requis.
-#   classifier : classifieur léger CNN/ViT, imports paresseux, GPU/CPU.
-BACKENDS = ("toy", "noisy", "vlm", "classifier")
+#   classifier : classifieur léger timm pré-entraîné, imports paresseux, GPU/CPU.
+#   cnn        : CNN maison from scratch (src/cnn_model.py), imports paresseux.
+BACKENDS = ("toy", "noisy", "vlm", "classifier", "cnn")
 
 
 def toy_predict(image_path: str | Path, mode: str = "baseline") -> dict[str, Any]:
@@ -94,4 +95,7 @@ def predict(
     if backend == "classifier":
         from .classifier import classifier_predict  # import paresseux (torch)
         return classifier_predict(image_path)
+    if backend == "cnn":
+        from .cnn_model import cnn_predict  # import paresseux (torch)
+        return cnn_predict(image_path)
     raise ValueError(f"Backend inconnu : {backend!r} (attendu : {BACKENDS})")

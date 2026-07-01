@@ -1,10 +1,15 @@
 .venv/
+venv/
 __pycache__/
 *.pyc
 .pytest_cache/
 .ipynb_checkpoints/
 tmp_uploads/
 medical_ai_evidence.sqlite
+
+# Données réelles RSNA : non redistribuables, jamais dans le dépôt
+data/rsna_cases.csv
+data/rsna/
 *.sqlite
 eval/outputs/
 finetuning/data/
